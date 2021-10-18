@@ -2,7 +2,7 @@ na classe Startup, implementado para desabilitar a validação padrão da ModelS
 Quando realiza o bind na controller, o retorno do erro é um formato esécífico do C#, porém
 queremos retornar um erro padrozinado, algo customizado, então precisa implementar esse cóidgo na Startup
             
-			services.Configure<ApiBehaviorOptions>(options =>
+			 dservices.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
             });

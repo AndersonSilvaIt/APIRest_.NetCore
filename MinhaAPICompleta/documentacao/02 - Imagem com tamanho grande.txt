@@ -1,0 +1,7 @@
+Criado o arquivo JsonWithFilesFormDataModelBinder para realizar o bind de imagens grandes ...
+
+
+Exemplo de controller que limite o tamanho de arquivos que recebe no parâmetro ... 
+
+        [RequestSizeLimit(40000000)] // Limita o tamanho de um arquivo para 40 Mb
+        //[DisableRequestSizeLimit] // desabilita o limite de tamanho de um rquivo de imagem

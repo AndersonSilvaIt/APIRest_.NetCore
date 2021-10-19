@@ -25,6 +25,8 @@ namespace DevIO.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddIdentityConfiguration(Configuration);
+
             services.AddAutoMapper(typeof(Startup));
 
             services.WebApiConfig();
@@ -43,6 +45,8 @@ namespace DevIO.Api
                 app.UseHsts();
             }
 
+            // a autenticação precisa vir antes da configuração do MVC
+            app.UseAuthentication();
             app.UseMvcConfiguration();
             
             app.UseRouting();

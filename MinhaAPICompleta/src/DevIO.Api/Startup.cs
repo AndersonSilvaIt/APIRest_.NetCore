@@ -1,3 +1,4 @@
+using DevIO.Api.Configuration;
 using DevIO.Api.Configurations;
 using DevIO.Data.Context;
 using Microsoft.AspNetCore.Builder;
@@ -5,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace DevIO.Api
 {
@@ -25,8 +25,6 @@ namespace DevIO.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddIdentityConfiguration(Configuration);
-
             services.AddAutoMapper(typeof(Startup));
 
             services.WebApiConfig();
@@ -34,7 +32,7 @@ namespace DevIO.Api
             services.ResolveDependencies();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -45,18 +43,7 @@ namespace DevIO.Api
                 app.UseHsts();
             }
 
-            // a autenticação precisa vir antes da configuração do MVC
-            app.UseAuthentication();
             app.UseMvcConfiguration();
-            
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
         }
     }
 }

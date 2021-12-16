@@ -1,0 +1,4 @@
+Para trancar as API para autorização (Login e Senha), é preciso implementar a princípio
+o atributo "Authorize" na controller.
+
+Para permitir um único método exposto, basta informar [AllowAnonymous] em cima do método;

@@ -31,6 +31,7 @@ namespace DevIO.Api.Configuration
         {
             app.UseHttpsRedirection();
             app.UseCors("Development");
+            //app.UseMvc();
 
             return app;
         }

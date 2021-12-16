@@ -1,0 +1,25 @@
+Criado um laço no arquivo appSettings para configuração do JWT
+
+Na classe IdentityConfig é implementado a configuração do JWT,
+é necessário instalar o JwtBearer.
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = true;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidAudience = appSettings.ValidoEm,
+                        ValidIssuer = appSettings.Emissor
+                    };
+                });
+				
+Realizado a configuração do token, onde é informado para validar o emissor junto da URL que será válida.

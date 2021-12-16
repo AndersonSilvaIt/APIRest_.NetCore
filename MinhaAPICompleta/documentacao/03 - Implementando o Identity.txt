@@ -2,3 +2,5 @@ Para trancar as API para autorização (Login e Senha), é preciso implementar a
 o atributo "Authorize" na controller.
 
 Para permitir um único método exposto, basta informar [AllowAnonymous] em cima do método;
+
+Implementado a controller para autenticação, AuthController.cs

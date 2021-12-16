@@ -27,5 +27,4 @@ namespace DevIO.Api.ViewModels
         public string Password { get; set; }
     }
 
-
 }

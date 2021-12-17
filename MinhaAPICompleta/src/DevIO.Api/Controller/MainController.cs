@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Linq;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.Controller
 {
     [ApiController]
     public abstract class MainController : ControllerBase
@@ -43,7 +43,8 @@ namespace DevIO.Api.Controllers
                 });
             }
 
-            return BadRequest(new { 
+            return BadRequest(new
+            {
                 success = false,
                 errors = _notificador.ObterNotificacoes().Select(n => n.Mensagem)
             });

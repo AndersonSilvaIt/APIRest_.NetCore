@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DevIO.Api.Controller;
 using DevIO.Api.Extensions;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Interfaces;
@@ -9,10 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.V1.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class FornecedoresController : MainController
     {
         private readonly IFornecedorRepository _fornecedorRepository;
@@ -33,14 +35,14 @@ namespace DevIO.Api.Controllers
         [HttpGet]
         public async Task<IEnumerable<FornecedorViewModel>> ObterTodos()
         {
-            var fornecedor = _mapper.Map<IEnumerable<FornecedorViewModel>> (await _fornecedorRepository.ObterTodos());
+            var fornecedor = _mapper.Map<IEnumerable<FornecedorViewModel>>(await _fornecedorRepository.ObterTodos());
             return fornecedor;
         }
 
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<FornecedorViewModel>> ObterPorId(Guid id)
         {
-            var fornecedor =  await ObterFornecedorProdutosEndereco(id);
+            var fornecedor = await ObterFornecedorProdutosEndereco(id);
 
             if (fornecedor == null) return NotFound();
 
@@ -71,12 +73,12 @@ namespace DevIO.Api.Controllers
             if (!ModelState.IsValid) CustomResponse(ModelState);
 
             await _fornecedorService.Atualizar(_mapper.Map<Fornecedor>(fornecedorViewModel));
-            
+
             return CustomResponse(fornecedorViewModel);
         }
 
         [ClaimsAuthorize("Fornecedor", "Excluir")]
-        [HttpDelete("{id:guid}")] 
+        [HttpDelete("{id:guid}")]
         public async Task<ActionResult<FornecedorViewModel>> Excluir(Guid id)
         {
             var fornecedorViewModel = await ObterFornecedorEndereco(id);

@@ -1,4 +1,5 @@
-﻿using DevIO.Api.Extensions;
+﻿using DevIO.Api.Controller;
+using DevIO.Api.Extensions;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Interfaces;
 using Microsoft.AspNetCore.Cors;
@@ -13,9 +14,10 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.V1.Controllers
 {
-    [Route("api")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}")]
     //[DisableCors] // Desabilita toda a configuração de cors, ninguém de fora terá acesso nessa controller.
     public class AuthController : MainController
     {
@@ -38,7 +40,7 @@ namespace DevIO.Api.Controllers
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            var user = new IdentityUser 
+            var user = new IdentityUser
             {
                 UserName = registerUser.Email,
                 Email = registerUser.Email,
@@ -184,7 +186,7 @@ namespace DevIO.Api.Controllers
 
         private static long ToUnixEpochDate(DateTime date)
         {
-           return (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
+            return (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
         }
 
     }

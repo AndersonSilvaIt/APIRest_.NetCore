@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DevIO.Api.Controller;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Interfaces;
 using DevIO.Business.Models;
@@ -9,9 +10,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.V1.Controllers
 {
-    [Route("api/produtos")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/produtos")]
     public class ProdutoController : MainController
     {
         private readonly IProdutoRepository _produtoRepository;
@@ -19,7 +21,7 @@ namespace DevIO.Api.Controllers
         IMapper _mapper;
 
         public ProdutoController(INotificador notificador, IProdutoRepository produtoRepository,
-                                 IProdutoService produtoService, IMapper mapper, 
+                                 IProdutoService produtoService, IMapper mapper,
                                  IUser user) : base(notificador, user)
         {
             _produtoRepository = produtoRepository;
@@ -49,8 +51,8 @@ namespace DevIO.Api.Controllers
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
             var imagemNome = Guid.NewGuid() + "_" + produtoViewModel.Imagem;
-            
-            if(!UploadArquivo(produtoViewModel.ImgUpload, imagemNome))
+
+            if (!UploadArquivo(produtoViewModel.ImgUpload, imagemNome))
                 return CustomResponse(produtoViewModel);
 
             produtoViewModel.Imagem = imagemNome;
@@ -75,10 +77,10 @@ namespace DevIO.Api.Controllers
 
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            if(produtoViewModel.ImgUpload != null)
+            if (produtoViewModel.ImgUpload != null)
             {
                 var imagemNome = Guid.NewGuid() + "_" + produtoViewModel.Imagem;
-                if(!UploadArquivo(produtoViewModel.ImgUpload, imagemNome))
+                if (!UploadArquivo(produtoViewModel.ImgUpload, imagemNome))
                 {
                     return CustomResponse(ModelState);
                 }
@@ -127,12 +129,12 @@ namespace DevIO.Api.Controllers
 
         private async Task<ProdutoViewModel> ObterProduto(Guid id)
         {
-            return _mapper.Map<ProdutoViewModel>(await _produtoRepository.ObterProdutoFornecedor(id)); 
+            return _mapper.Map<ProdutoViewModel>(await _produtoRepository.ObterProdutoFornecedor(id));
         }
 
         private bool UploadArquivo(string arquivo, string imgNome)
         {
-            if(string.IsNullOrWhiteSpace(arquivo))
+            if (string.IsNullOrWhiteSpace(arquivo))
             {
                 NotificarErro("Forneça uma imagem para este produto");
                 return false;

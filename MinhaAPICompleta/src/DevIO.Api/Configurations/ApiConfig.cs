@@ -15,6 +15,20 @@ namespace DevIO.Api.Configuration
 
             });
 
+            services.AddApiVersioning(options =>
+            {
+                // Quanto não tiver versão especificada, deve assumir uma versão padrão
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.ReportApiVersions = true;
+            });
+
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
             services.AddCors(options =>
             {
                 options.AddPolicy("Development",

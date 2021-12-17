@@ -1,0 +1,22 @@
+Para gerenciar o versionamento das APIs é necessário instalar dois pacotes.
+
+install-package Microsoft.AspNetCore.Mvc.Versioning
+
+install-package Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer
+
+Depois é necessário configurar o versionamento,
+services.AddApiVersioning();
+
+            services.AddApiVersioning(options =>
+            {
+                // Quanto não tiver versão especificada, deve assumir uma versão padrão
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.ReportApiVersions = true;
+            });
+
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });

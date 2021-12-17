@@ -2,7 +2,7 @@
 using DevIO.Api.ViewModels;
 using DevIO.Business.Models;
 
-namespace DevIO.Api.Configurations
+namespace DevIO.Api.Configuration
 {
     public class AutomapperConfig : Profile
     {
@@ -15,7 +15,7 @@ namespace DevIO.Api.Configurations
             CreateMap<ProdutoImagemViewModel, Produto>().ReverseMap();
 
             CreateMap<Produto, ProdutoViewModel>()
-                    .ForMember(dest => dest.NomeFornecedor, opt => opt.MapFrom(src => src.Fornecedor.Nome));
+                .ForMember(dest => dest.NomeFornecedor, opt => opt.MapFrom(src => src.Fornecedor.Nome));
         }
     }
 }

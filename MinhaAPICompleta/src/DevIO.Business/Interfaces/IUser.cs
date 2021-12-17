@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace DevIO.Business.Interfaces
+namespace DevIO.Business.Intefaces
 {
     public interface IUser
     {
@@ -10,7 +10,7 @@ namespace DevIO.Business.Interfaces
         Guid GetUserId();
         string GetUserEmail();
         bool IsAuthenticated();
-        bool IsInRole();
+        bool IsInRole(string role);
         IEnumerable<Claim> GetClaimsIdentity();
     }
 }

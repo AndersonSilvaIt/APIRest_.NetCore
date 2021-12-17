@@ -1,5 +1,5 @@
-﻿using DevIO.Api.Controller;
-using DevIO.Business.Interfaces;
+﻿using DevIO.Api.Controllers;
+using DevIO.Business.Intefaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevIO.Api.V1.Controllers
@@ -8,15 +8,15 @@ namespace DevIO.Api.V1.Controllers
     [Route("api/v{version:apiVersion}/teste")]
     public class TesteController : MainController
     {
-        public TesteController(INotificador notificador, IUser user) : base(notificador, user)
+
+        public TesteController(INotificador notificador, IUser appUser) : base(notificador, appUser)
         {
         }
 
-        [HttpGet()]
+        [HttpGet]
         public string Valor()
         {
             return "Sou a V1";
         }
-
     }
 }

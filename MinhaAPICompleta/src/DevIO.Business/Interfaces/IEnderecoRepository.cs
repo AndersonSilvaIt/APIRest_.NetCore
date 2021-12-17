@@ -1,11 +1,11 @@
-﻿using DevIO.Business.Models;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using DevIO.Business.Models;
 
-namespace DevIO.Business.Interfaces
+namespace DevIO.Business.Intefaces
 {
-	public interface IEnderecoRepository : IRepository<Endereco>
- 	{
-		Task<Endereco> ObterEnderecoPorFornecedor(Guid fornecedorId); // Obtem um endereço atravez do fornecedor
-	}
+    public interface IEnderecoRepository : IRepository<Endereco>
+    {
+        Task<Endereco> ObterEnderecoPorFornecedor(Guid fornecedorId);
+    }
 }

@@ -1,5 +1,5 @@
+using AutoMapper;
 using DevIO.Api.Configuration;
-using DevIO.Api.Configurations;
 using DevIO.Data.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,10 +23,10 @@ namespace DevIO.Api
                 .AddJsonFile($"appsettings.{hostEnvironment.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables();
 
-            //if (hostEnvironment.IsDevelopment())
-            //{
-            //    builder.AddUserSecrets<Startup>();
-            //}
+            if (hostEnvironment.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
 
             Configuration = builder.Build();
         }
@@ -38,17 +38,15 @@ namespace DevIO.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddIdentityConfiguration(Configuration);
+            services.AddIdentityConfig(Configuration);
 
             services.AddAutoMapper(typeof(Startup));
 
-            services.WebApiConfig();
+            services.AddApiConfig();
 
             services.AddSwaggerConfig();
 
-            services.AddLoggingConfiguration(Configuration);
-
-            services.AddHealthChecksUI();
+            services.AddLoggingConfig(Configuration);
 
             services.ResolveDependencies();
         }
@@ -59,10 +57,7 @@ namespace DevIO.Api
 
             app.UseSwaggerConfig(provider);
 
-            app.UseApiConfig(env);
             app.UseLoggingConfiguration();
-
-
         }
     }
 }

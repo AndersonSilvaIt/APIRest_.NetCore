@@ -1,34 +1,44 @@
-﻿using AutoMapper;
-using DevIO.Api.Controller;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Threading.Tasks;
+using AutoMapper;
+using DevIO.Api.Controllers;
+using DevIO.Api.Extensions;
 using DevIO.Api.ViewModels;
-using DevIO.Business.Interfaces;
+using DevIO.Business.Intefaces;
 using DevIO.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DevIO.Api.V1.Controllers
 {
     [Authorize]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/produtos")]
-    public class ProdutoController : MainController
+    public class ProdutosController : MainController
     {
         private readonly IProdutoRepository _produtoRepository;
         private readonly IProdutoService _produtoService;
-        IMapper _mapper;
+        private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProdutoController(INotificador notificador, IProdutoRepository produtoRepository,
-                                 IProdutoService produtoService, IMapper mapper,
-                                 IUser user) : base(notificador, user)
+        public ProdutosController(INotificador notificador,
+                                  IProdutoRepository produtoRepository,
+                                  IProdutoService produtoService,
+                                  IMapper mapper,
+                                  IUser user,
+                                  IHttpContextAccessor httpContextAccessor) : base(notificador, user)
         {
             _produtoRepository = produtoRepository;
             _produtoService = produtoService;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -37,7 +47,7 @@ namespace DevIO.Api.V1.Controllers
             return _mapper.Map<IEnumerable<ProdutoViewModel>>(await _produtoRepository.ObterProdutosFornecedores());
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<ProdutoViewModel>> ObterPorId(Guid id)
         {
             var produtoViewModel = await ObterProduto(id);
@@ -47,48 +57,53 @@ namespace DevIO.Api.V1.Controllers
             return produtoViewModel;
         }
 
+        [ClaimsAuthorize("Produto", "Adicionar")]
         [HttpPost]
         public async Task<ActionResult<ProdutoViewModel>> Adicionar(ProdutoViewModel produtoViewModel)
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
             var imagemNome = Guid.NewGuid() + "_" + produtoViewModel.Imagem;
-
-            if (!UploadArquivo(produtoViewModel.ImgUpload, imagemNome))
+            if (!UploadArquivo(produtoViewModel.ImagemUpload, imagemNome))
+            {
                 return CustomResponse(produtoViewModel);
+            }
 
             produtoViewModel.Imagem = imagemNome;
-
             await _produtoService.Adicionar(_mapper.Map<Produto>(produtoViewModel));
 
             return CustomResponse(produtoViewModel);
         }
 
-        [HttpPut("{id}")]
+        [ClaimsAuthorize("Produto", "Atualizar")]
+        [HttpPut("{id:guid}")]
         public async Task<IActionResult> Atualizar(Guid id, ProdutoViewModel produtoViewModel)
         {
             if (id != produtoViewModel.Id)
             {
-                NotificarErro("Os ids informados não são iguais");
+                NotificarErro("Os ids informados não são iguais!");
                 return CustomResponse();
             }
 
             var produtoAtualizacao = await ObterProduto(id);
 
-            produtoViewModel.Imagem = produtoAtualizacao.Imagem;
+            if (string.IsNullOrEmpty(produtoViewModel.Imagem))
+                produtoViewModel.Imagem = produtoAtualizacao.Imagem;
 
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            if (produtoViewModel.ImgUpload != null)
+            if (produtoViewModel.ImagemUpload != null)
             {
                 var imagemNome = Guid.NewGuid() + "_" + produtoViewModel.Imagem;
-                if (!UploadArquivo(produtoViewModel.ImgUpload, imagemNome))
+                if (!UploadArquivo(produtoViewModel.ImagemUpload, imagemNome))
                 {
                     return CustomResponse(ModelState);
                 }
+
                 produtoAtualizacao.Imagem = imagemNome;
             }
 
+            produtoAtualizacao.FornecedorId = produtoViewModel.FornecedorId;
             produtoAtualizacao.Nome = produtoViewModel.Nome;
             produtoAtualizacao.Descricao = produtoViewModel.Descricao;
             produtoAtualizacao.Valor = produtoViewModel.Valor;
@@ -99,33 +114,16 @@ namespace DevIO.Api.V1.Controllers
             return CustomResponse(produtoViewModel);
         }
 
-        [RequestSizeLimit(40000000)] // Limita o tamanho de um arquivo para 40 Mb
-        //[DisableRequestSizeLimit] // desabilita o limite de tamanho de um rquivo de imagem
-        [HttpPost("Adicioanar")]
-        public async Task<ActionResult<ProdutoViewModel>> AdicionarAlternativo(ProdutoImagemViewModel produtoViewModel)
-        {
-            if (!ModelState.IsValid) return CustomResponse(ModelState);
-
-            var imagemNomePrefixo = Guid.NewGuid() + "_";
-
-            if (!await UploadArquivoAlternativo(produtoViewModel.ImgUpload, imagemNomePrefixo))
-                return CustomResponse(produtoViewModel);
-
-            produtoViewModel.Imagem = imagemNomePrefixo + produtoViewModel.ImgUpload.FileName;
-
-            await _produtoService.Adicionar(_mapper.Map<Produto>(produtoViewModel));
-
-            return CustomResponse(produtoViewModel);
-        }
-
+        [ClaimsAuthorize("Produto", "Excluir")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult<ProdutoViewModel>> Excluir(Guid id)
         {
-            var produto = await ObterPorId(id);
+            var produto = await ObterProduto(id);
 
             if (produto == null) return NotFound();
 
             await _produtoService.Remover(id);
+
             return CustomResponse(produto);
         }
 
@@ -136,19 +134,19 @@ namespace DevIO.Api.V1.Controllers
 
         private bool UploadArquivo(string arquivo, string imgNome)
         {
-            if (string.IsNullOrWhiteSpace(arquivo))
+            if (string.IsNullOrEmpty(arquivo))
             {
-                NotificarErro("Forneça uma imagem para este produto");
+                NotificarErro("Forneça uma imagem para este produto!");
                 return false;
             }
 
             var imageDataByteArray = Convert.FromBase64String(arquivo);
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagens", imgNome);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imgNome);
 
             if (System.IO.File.Exists(filePath))
             {
-                NotificarErro("Já existe um arquivo com este nome");
+                NotificarErro("Já existe um arquivo com este nome!");
                 return false;
             }
 
@@ -157,25 +155,54 @@ namespace DevIO.Api.V1.Controllers
             return true;
         }
 
-        //Upload de arquivos grandes
+        #region UploadAlternativo
+
+        [ClaimsAuthorize("Produto", "Adicionar")]
+        [HttpPost("Adicionar")]
+        public async Task<ActionResult<ProdutoViewModel>> AdicionarAlternativo(
+            // Binder personalizado para envio de IFormFile e ViewModel dentro de um FormData compatível com .NET Core 3.1 ou superior (system.text.json)
+            [ModelBinder(BinderType = typeof(ProdutoModelBinder))]
+            ProdutoImagemViewModel produtoViewModel)
+        {
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            var imgPrefixo = Guid.NewGuid() + "_";
+            if (!await UploadArquivoAlternativo(produtoViewModel.ImagemUpload, imgPrefixo))
+            {
+                return CustomResponse(ModelState);
+            }
+
+            produtoViewModel.Imagem = imgPrefixo + produtoViewModel.ImagemUpload.FileName;
+            await _produtoService.Adicionar(_mapper.Map<Produto>(produtoViewModel));
+
+            return CustomResponse(produtoViewModel);
+        }
+
+        [RequestSizeLimit(40000000)]
+        //[DisableRequestSizeLimit]
+        [HttpPost("imagem")]
+        public ActionResult AdicionarImagem(IFormFile file)
+        {
+            return Ok(file);
+        }
+
         private async Task<bool> UploadArquivoAlternativo(IFormFile arquivo, string imgPrefixo)
         {
-            if (arquivo == null || arquivo.Length <= 0)
+            if (arquivo == null || arquivo.Length == 0)
             {
-                NotificarErro("Forneça uma imagem para este produto");
+                NotificarErro("Forneça uma imagem para este produto!");
                 return false;
             }
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagens", imgPrefixo + arquivo.FileName);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imgPrefixo + arquivo.FileName);
 
-
-            if (System.IO.File.Exists(filePath))
+            if (System.IO.File.Exists(path))
             {
-                NotificarErro("Já existe um arquivo com este nome");
+                NotificarErro("Já existe um arquivo com este nome!");
                 return false;
             }
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            using (var stream = new FileStream(path, FileMode.Create))
             {
                 await arquivo.CopyToAsync(stream);
             }
@@ -183,5 +210,6 @@ namespace DevIO.Api.V1.Controllers
             return true;
         }
 
+        #endregion
     }
 }

@@ -1,13 +1,13 @@
-﻿using DevIO.Business.Models;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using DevIO.Business.Models;
 
-namespace DevIO.Business.Interfaces
+namespace DevIO.Business.Intefaces
 {
-	public interface IProdutoService
-	{
-		Task Adicionar(Produto produto);
-		Task Atualizar(Produto produto);
-		Task Remover(Guid id);
-	}
+    public interface IProdutoService : IDisposable
+    {
+        Task Adicionar(Produto produto);
+        Task Atualizar(Produto produto);
+        Task Remover(Guid id);
+    }
 }

@@ -1,21 +1,20 @@
-﻿using DevIO.Business.Interfaces;
+﻿using System;
+using System.Threading.Tasks;
+using DevIO.Business.Intefaces;
 using DevIO.Business.Models;
 using DevIO.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 namespace DevIO.Data.Repository
 {
-	public class EnderecoRepository: Repository<Endereco>, IEnderecoRepository
-	{
-		public EnderecoRepository(MeuDbContext contexto) : base(contexto) {
-		}
-		public async Task<Endereco> ObterEnderecoPorFornecedor(Guid fornecedorId) {
+    public class EnderecoRepository : Repository<Endereco>, IEnderecoRepository
+    {
+        public EnderecoRepository(MeuDbContext context) : base(context) { }
 
-			//Obtem o endereco por fornecedor
-			return await Db.Enderecos.AsNoTracking()
-					.FirstOrDefaultAsync(f => f.FornecedorId == fornecedorId);
-		}
-	}
+        public async Task<Endereco> ObterEnderecoPorFornecedor(Guid fornecedorId)
+        {
+            return await Db.Enderecos.AsNoTracking()
+                .FirstOrDefaultAsync(f => f.FornecedorId == fornecedorId);
+        }
+    }
 }

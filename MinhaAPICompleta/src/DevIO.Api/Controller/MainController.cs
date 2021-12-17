@@ -1,25 +1,27 @@
-﻿using DevIO.Business.Interfaces;
+﻿using System;
+using System.Linq;
+using DevIO.Business.Intefaces;
 using DevIO.Business.Notificacoes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
-using System.Linq;
 
-namespace DevIO.Api.Controller
+namespace DevIO.Api.Controllers
 {
     [ApiController]
     public abstract class MainController : ControllerBase
     {
         private readonly INotificador _notificador;
-        public readonly IUser _appUser;
+        public readonly IUser AppUser;
+
         protected Guid UsuarioId { get; set; }
         protected bool UsuarioAutenticado { get; set; }
 
-        public MainController(INotificador notificador,
-            IUser appUser)
+        protected MainController(INotificador notificador,
+                                 IUser appUser)
         {
             _notificador = notificador;
-            _appUser = appUser;
+            AppUser = appUser;
+
             if (appUser.IsAuthenticated())
             {
                 UsuarioId = appUser.GetUserId();
@@ -29,7 +31,7 @@ namespace DevIO.Api.Controller
 
         protected bool OperacaoValida()
         {
-            return _notificador.TemNotificacao();
+            return !_notificador.TemNotificacao();
         }
 
         protected ActionResult CustomResponse(object result = null)
@@ -53,17 +55,16 @@ namespace DevIO.Api.Controller
         protected ActionResult CustomResponse(ModelStateDictionary modelState)
         {
             if (!modelState.IsValid) NotificarErroModelInvalida(modelState);
-
             return CustomResponse();
         }
 
-        public void NotificarErroModelInvalida(ModelStateDictionary modelState)
+        protected void NotificarErroModelInvalida(ModelStateDictionary modelState)
         {
             var erros = modelState.Values.SelectMany(e => e.Errors);
             foreach (var erro in erros)
             {
-                var errorMessage = erro.Exception == null ? erro.ErrorMessage : erro.Exception.Message;
-                NotificarErro(errorMessage);
+                var errorMsg = erro.Exception == null ? erro.ErrorMessage : erro.Exception.Message;
+                NotificarErro(errorMsg);
             }
         }
 

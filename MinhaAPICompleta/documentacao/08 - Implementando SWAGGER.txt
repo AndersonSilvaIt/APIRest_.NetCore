@@ -1,0 +1,8 @@
+Necesário instalar o Swagger
+
+install-package Swashbuckle.AspNetCore
+
+install-package AspNetCore.Mvc.Versioning  4.1.1
+install-package AspNetCore.Mvc.Versioning.ApiExplorer  4.1.1
+
+Criado a classe de configuração do Swagger SwaggerConfig.cs

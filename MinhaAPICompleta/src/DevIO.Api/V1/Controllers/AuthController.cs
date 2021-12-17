@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 
 namespace DevIO.Api.V1.Controllers
 {
+    //[DisableCors] // Desabilita toda a configuração de cors, ninguém de fora terá acesso nessa controller.
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}")]
-    //[DisableCors] // Desabilita toda a configuração de cors, ninguém de fora terá acesso nessa controller.
     public class AuthController : MainController
     {
         private readonly SignInManager<IdentityUser> _signInManager;

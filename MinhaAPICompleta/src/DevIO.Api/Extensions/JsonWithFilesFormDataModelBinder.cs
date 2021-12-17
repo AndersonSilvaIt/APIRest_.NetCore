@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace DevIO.Api.Extensions
+
 {
     // verifica se tem uma entrada de Json ou de Form ao mesmo tempo ...
     public class JsonWithFilesFormDataModelBinder : IModelBinder

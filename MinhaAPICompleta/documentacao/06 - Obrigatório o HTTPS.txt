@@ -1,0 +1,4 @@
+Configurações necessárias para abrir o browser usando somente HTTPS
+
+app.UseHsts();
+ app.UseHttpsRedirection();

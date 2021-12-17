@@ -1,0 +1,9 @@
+Cross-Origin Resource Sharing
+
+Compartilhamento de recurso cross origem.
+
+Compartilhar recursos que não estejam no próprio domínio, que está hospedado em outro local.
+
+O CORS é para liberar acessos à sua aplicação, se retirar a configuração do cors, ninguém terá acessos
+em sua API, então o CORS é para "relaxar" a segurança, liberar os acessos para apenas Métodos, header e URLs
+específicas;

@@ -1,0 +1,3 @@
+Implementado a interface IUser na camda de Negócio(Business), e implementado na App, isso serve
+para obter o usuário em várias camadas caso necessário, basta realizar a injeção de Dependência
+aonde irá utilizar.

@@ -1,0 +1,43 @@
+Verificar o KissLog, é gratuito.
+
+elmah.io  - Serviço de Log que será utilizado.
+
+Elmah API Key: e2b6f9152c2a40f6bed093e28feffcc4
+elmah log Id: 157608c0-dbf7-473c-8858-aed4d83977a6
+
+install-package elmah.Io.AspNetCore
+
+        public static IServiceCollection AddLoggingConfiguration(this IServiceCollection services)
+        {
+            services.AddElmahIo(o =>
+           {
+               o.ApiKey = "e2b6f9152c2a40f6bed093e28feffcc4";
+               o.LogId = new Guid("157608c0-dbf7-473c-8858-aed4d83977a6");
+           });
+
+            // Para configurar o Logg do AspNetCore logar diretamente no servidor do Elmah.io
+            services.AddLogging(builder =>
+            {
+
+            });
+
+            return services;
+        }
+		
+		Realizado a configuração do Elmah.io
+		Para linkar os Logs do .Net dentro do servidor do Elmah, é necessário instalar mais um pacote
+		onde terá o provider do elmah para o logging do .net Core.
+		
+		install-package Elmah.Io.Extensions.Logging
+		
+            services.AddLogging(builder =>
+            {
+                builder.AddElmahIo(o =>
+                {
+                    o.ApiKey = "e2b6f9152c2a40f6bed093e28feffcc4";
+                    o.LogId = new Guid("157608c0-dbf7-473c-8858-aed4d83977a6");
+                });
+                builder.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Warning);
+            });
+
+será logado somente dados do tipo "Warning"			

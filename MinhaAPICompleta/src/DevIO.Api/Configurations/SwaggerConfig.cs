@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,14 +9,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace DevIO.Api.Configurations
+namespace DevIO.Api.Configuration
 {
-
     public static class SwaggerConfig
     {
         public static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
@@ -46,7 +44,6 @@ namespace DevIO.Api.Configurations
                         new string[] {}
                     }
                 });
-
             });
 
             return services;
@@ -54,30 +51,29 @@ namespace DevIO.Api.Configurations
 
         public static IApplicationBuilder UseSwaggerConfig(this IApplicationBuilder app, IApiVersionDescriptionProvider provider)
         {
+            //app.UseMiddleware<SwaggerAuthorizedMiddleware>();
             app.UseSwagger();
-            app.UseSwaggerUI(options =>
-           {
-               foreach (var decription in provider.ApiVersionDescriptions)
-               {
-                   options.SwaggerEndpoint($"/swagger/{decription.GroupName}/swagger.json", decription.GroupName.ToUpperInvariant());
-               }
-           });
-
+            app.UseSwaggerUI(
+                options =>
+                {
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    }
+                });
             return app;
         }
     }
 
     public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
-        readonly IApiVersionDescriptionProvider _provider;
-        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
-        {
-            _provider = provider;
-        }
+        readonly IApiVersionDescriptionProvider provider;
+
+        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) => this.provider = provider;
 
         public void Configure(SwaggerGenOptions options)
         {
-            foreach (var description in _provider.ApiVersionDescriptions)
+            foreach (var description in provider.ApiVersionDescriptions)
             {
                 options.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description));
             }
@@ -163,5 +159,4 @@ namespace DevIO.Api.Configurations
             await _next.Invoke(context);
         }
     }
-
 }

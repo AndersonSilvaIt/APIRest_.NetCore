@@ -1,4 +1,3 @@
-using AutoMapper;
 using DevIO.Api.Configuration;
 using DevIO.Api.Configurations;
 using DevIO.Data.Context;
@@ -47,7 +46,9 @@ namespace DevIO.Api
 
             services.AddSwaggerConfig();
 
-            services.AddLoggingConfiguration();
+            services.AddLoggingConfiguration(Configuration);
+
+            services.AddHealthChecksUI();
 
             services.ResolveDependencies();
         }
@@ -60,6 +61,8 @@ namespace DevIO.Api
 
             app.UseApiConfig(env);
             app.UseLoggingConfiguration();
+
+
         }
     }
 }

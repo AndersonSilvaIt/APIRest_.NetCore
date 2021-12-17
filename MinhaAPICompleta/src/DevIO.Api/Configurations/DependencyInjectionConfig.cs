@@ -1,4 +1,5 @@
-﻿using DevIO.Api.Extensions;
+﻿using DevIO.Api.Configuration;
+using DevIO.Api.Extensions;
 using DevIO.Business.Interfaces;
 using DevIO.Business.Notificacoes;
 using DevIO.Business.Services;

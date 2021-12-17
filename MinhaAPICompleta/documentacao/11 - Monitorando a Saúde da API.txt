@@ -1,0 +1,24 @@
+Na startup adicionado os HelfChecks
+
+services.AddHealthChecks();
+
+app.UseHealthChecks("/hc");
+
+a qualquer momento que chamar a url localhost: .... /hc , terá a informação
+da API
+
+Instalar o pacote 
+install-package AspNetCore.HealthChecks.SqlServer,
+pacote utilizado para verificar a comunicação com o banco e etc,
+tem um pacote específico para cada banco.
+
+Instalado também o HealthCheck visual
+
+install-package aspnetcore.healthchecks.ui
+
+install-package aspnetcore.healthchecks.ui.Client
+
+para realizar a integração do HealthCheck com o Elmah
+é necessário instalar um novo pacote
+
+install-package Elmah.io.AspNetCore.HealthChecks
